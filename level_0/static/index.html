@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Поиск заказа</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+    .container { max-width: 500px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+    h1 { text-align: center; }
+    input { width: 100%; padding: 10px; font-size: 1.1em; margin-bottom: 12px; border-radius: 4px; border: 1px solid #ccc; }
+    button { width: 100%; padding: 10px; font-size: 1.1em; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #1565c0; }
+    pre { background: #222; color: #b9f; padding: 16px; border-radius: 6px; min-height: 60px; margin-top: 18px; font-size: 1em; overflow-x: auto; }
+    .error { color: #d32f2f; background: #fff0f0; padding: 10px; border-radius: 4px; margin-top: 10px; text-align: center; }
+    .footer { text-align: center; color: #888; margin-top: 30px; font-size: 0.95em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Поиск заказа по ID</h1>
+    <input id="oid" placeholder="order_uid" autofocus />
+    <button onclick="findOrder()">Найти</button>
+    <div id="err" class="error" style="display:none"></div>
+    <pre id="result">Введите order_uid и нажмите "Найти"</pre>
+  </div>
+  <div class="footer">Demo &middot; WBTech</div>
+  <script>
+    const oid = document.getElementById('oid');
+    oid.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') findOrder();
+    });
+    function findOrder() {
+      const orderId = oid.value.trim();
+      const result = document.getElementById('result');
+      const err = document.getElementById('err');
+      err.style.display = 'none';
+      result.textContent = 'Загрузка...';
+      fetch('/order/' + encodeURIComponent(orderId))
+        .then(r => {
+          if (!r.ok) throw new Error('Не найдено');
+          return r.json();
+        })
+        .then(data => {
+          result.textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(e => {
+          result.textContent = '';
+          err.textContent = e.message || e;
+          err.style.display = 'block';
+        });
+    }
+  </script>
+</body>
+</html> 
